@@ -1,16 +1,30 @@
 package com.example.holidaydestinationsapp;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+
 import java.util.UUID;
 
 public class SignInActivity extends AppCompatActivity {
+    private static final int RC_SIGN_IN = 100;
+
     private EditText usernameInput;
     private EditText passwordInput;
     private Button signInButton;
@@ -36,13 +50,58 @@ public class SignInActivity extends AppCompatActivity {
         spManager = SharedPreferencesManager.getInstance(this);
         signInButton.setOnClickListener(this::onClickSignInButton);
         signUpButton.setOnClickListener(this::onClickSignUpButton);
+        findViewById(R.id.sign_in_button).setOnClickListener(this::onClickSignInGoogleButton);
 
         isSigningIn = false;
         passwordToCheck = null;
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        User.googleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            // Google user already signed in.
+            User.signedInUser = new User(-1, account.getDisplayName());
+            this.startActivity(new Intent(this, HomeActivity.class));
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
     }
 
     public void onClickSignUpButton(View v) {
         this.startActivity(new Intent(this, SignUpActivity.class));
+    }
+
+    public void onClickSignInGoogleButton(View v) {
+        Intent signInIntent = User.googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            // Google user signed in.
+            User.signedInUser = new User(-1, account.getDisplayName());
+            this.startActivity(new Intent(this, HomeActivity.class));
+        } catch (ApiException e) {
+            finish();
+            startActivity(getIntent());
+        }
     }
 
     public void onClickSignInButton(View v) {
