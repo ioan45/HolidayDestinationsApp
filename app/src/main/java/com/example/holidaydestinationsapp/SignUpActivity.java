@@ -64,7 +64,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 " FROM " + DbHelper.USERS_TABLE +
                                 " WHERE " + DbHelper.USERS_COL_USERNAME + "='" + usernameToRegister + "'";
         dbHelper.rawQueryAsync(checkUserQuery, (Cursor cursor) -> {
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
                 Toast.makeText(this, "Username already exists", Toast.LENGTH_SHORT).show();
                 isSigningUp = false;
             } else {
@@ -74,8 +74,7 @@ public class SignUpActivity extends AppCompatActivity {
                                           emailToRegister + "')";
                 dbHelper.execSQLAsync(insertUserQuery, this::OnUserCreated);
             }
-            if (cursor != null)
-                cursor.close();
+            cursor.close();
         });
     }
 

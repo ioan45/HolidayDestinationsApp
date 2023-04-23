@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
@@ -67,8 +68,7 @@ public class SignInActivity extends AppCompatActivity {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
             // Google user already signed in.
-            User.signedInUser = new User(-1, account.getDisplayName());
-            this.startActivity(new Intent(this, HomeActivity.class));
+            signInGoogleUser(account.getId(), account.getDisplayName(), account.getEmail());
         }
     }
 
@@ -95,9 +95,8 @@ public class SignInActivity extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            // Google user signed in.
-            User.signedInUser = new User(-1, account.getDisplayName());
-            this.startActivity(new Intent(this, HomeActivity.class));
+            // User has signed in with google.
+            signInGoogleUser(account.getId(), account.getDisplayName(), account.getEmail());
         } catch (ApiException e) {
             finish();
             startActivity(getIntent());
@@ -128,24 +127,51 @@ public class SignInActivity extends AppCompatActivity {
     private void onGetUserComplete(Cursor cursor) {
         User user = null;
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             int idIndex = cursor.getColumnIndex(DbHelper.USERS_COL_ID);
             if (idIndex >= 0) {
                 int userId = cursor.getInt(idIndex);
-                user = new User(userId, usernameToCheck);
+                user = new User(userId, usernameToCheck, usernameToCheck);
             }
         }
-        if (cursor != null)
-            cursor.close();
+        cursor.close();
 
         isSigningIn = false;
         if (user == null) {
             Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
         } else {
-            User.signedInUser = user;
             createUserSession(user.getId());
-            this.startActivity(new Intent(this, HomeActivity.class));
+            signInUser(user);
         }
+    }
+
+    private void signInUser(User user) {
+        User.signedInUser = user;
+        this.startActivity(new Intent(this, HomeActivity.class));
+    }
+
+    private void signInGoogleUser(String username, String displayName, String email) {
+        String selectQuery = "SELECT " + DbHelper.USERS_COL_ID +
+                             " FROM " + DbHelper.USERS_TABLE +
+                             " WHERE " + DbHelper.USERS_COL_USERNAME + "='" + username + "'";
+        dbHelper.rawQueryAsync(selectQuery, (Cursor cursor) -> {
+            if (cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndex(DbHelper.USERS_COL_ID);
+                if (idIndex >= 0) {
+                    int userId = cursor.getInt(idIndex);
+                    signInUser(new User(userId, username, displayName));
+                }
+            } else {
+                String insertUserQuery = "INSERT INTO " + DbHelper.USERS_TABLE + " VALUES(NULL, '" +
+                                          username + "', '" +
+                                          "google" + "', '" +
+                                          email + "')";
+                dbHelper.execSQLAsync(insertUserQuery, () -> {
+                    signInGoogleUser(username, displayName, email);
+                });
+            }
+            cursor.close();
+        });
     }
 
     private void createUserSession(int userId) {

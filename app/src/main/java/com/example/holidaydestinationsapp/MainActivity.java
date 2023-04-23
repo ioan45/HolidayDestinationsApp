@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     public void OnGetUserTaskComplete(Cursor cursor) {
         User user = null;
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             int idIndex = cursor.getColumnIndex("us." + DbHelper.USERS_COL_ID);
             int usernameIndex = cursor.getColumnIndex("us." + DbHelper.USERS_COL_USERNAME);
             int dateIndex = cursor.getColumnIndex("ss." + DbHelper.SESSIONS_COL_START_DATE);
@@ -41,12 +41,11 @@ public class MainActivity extends AppCompatActivity {
                 long dateAsSecondsSinceEpoch = cursor.getLong(dateIndex);
                 if (System.currentTimeMillis() / 1000 - dateAsSecondsSinceEpoch < 86400) {
                     // A session is valid for 1 day.
-                    user = new User(userId, username);
+                    user = new User(userId, username, username);
                 }
             }
         }
-        if (cursor != null)
-            cursor.close();
+        cursor.close();
 
         if (user == null) {
             this.startActivity(new Intent(this, SignInActivity.class));

@@ -24,7 +24,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onSignOutButtonPress(View v) {
-        if (User.signedInUser.getId() == -1) {
+        if (!User.signedInUser.getUsername().equals(User.signedInUser.getDisplayName())) {
             // Signed in using google account.
             User.googleSignInClient.signOut()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
