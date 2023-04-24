@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HolidayDestinationsApp</string>
+    <string name="greetings">Hi, %1$s!</string>
 </resources>

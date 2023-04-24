@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -165,7 +166,8 @@ public class SignInActivity extends AppCompatActivity {
                 String insertUserQuery = "INSERT INTO " + DbHelper.USERS_TABLE + " VALUES(NULL, '" +
                                           username + "', '" +
                                           "google" + "', '" +
-                                          email + "')";
+                                          email + "', " +
+                                          "NULL)";
                 dbHelper.execSQLAsync(insertUserQuery, () -> {
                     signInGoogleUser(username, displayName, email);
                 });

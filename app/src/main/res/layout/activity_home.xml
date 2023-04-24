@@ -11,10 +11,10 @@
         android:layout_centerInParent="true">
     </TextView>
     <Button
-        android:id="@+id/homeSignOutButton"
+        android:id="@+id/toProfileButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SIGN OUT"
+        android:text="Profile"
         android:textSize="20sp"
         android:layout_margin="20dp">
     </Button>

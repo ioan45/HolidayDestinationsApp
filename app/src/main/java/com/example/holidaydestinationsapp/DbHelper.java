@@ -61,6 +61,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public static final String USERS_COL_USERNAME = "username";
     public static final String USERS_COL_PASSWORD = "password";
     public static final String USERS_COL_EMAIL = "email";
+    public static final String USERS_COL_PROFILE_IMG = "profile_img";
     public static final String SESSIONS_TABLE = "session";
     public static final String SESSIONS_COL_USER_ID = "user_id";
     public static final String SESSIONS_COL_TOKEN = "token";
@@ -84,7 +85,8 @@ public class DbHelper extends SQLiteOpenHelper {
                                    USERS_COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                                    USERS_COL_USERNAME + " TEXT," +
                                    USERS_COL_PASSWORD + " TEXT, " +
-                                   USERS_COL_EMAIL + " TEXT)";
+                                   USERS_COL_EMAIL + " TEXT, " +
+                                   USERS_COL_PROFILE_IMG + " BLOB)";
         String createSessionsQuery = "CREATE TABLE " + SESSIONS_TABLE + "(" +
                                       SESSIONS_COL_USER_ID + " INTEGER PRIMARY KEY," +
                                       SESSIONS_COL_TOKEN + " TEXT," +

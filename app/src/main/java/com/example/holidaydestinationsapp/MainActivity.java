@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
         User user = null;
 
         if (cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndex("us." + DbHelper.USERS_COL_ID);
-            int usernameIndex = cursor.getColumnIndex("us." + DbHelper.USERS_COL_USERNAME);
-            int dateIndex = cursor.getColumnIndex("ss." + DbHelper.SESSIONS_COL_START_DATE);
+            int idIndex = cursor.getColumnIndex(DbHelper.USERS_COL_ID);
+            int usernameIndex = cursor.getColumnIndex(DbHelper.USERS_COL_USERNAME);
+            int dateIndex = cursor.getColumnIndex(DbHelper.SESSIONS_COL_START_DATE);
             if (idIndex >= 0 && usernameIndex >= 0 && dateIndex >= 0) {
                 int userId = cursor.getInt(idIndex);
                 String username = cursor.getString(usernameIndex);

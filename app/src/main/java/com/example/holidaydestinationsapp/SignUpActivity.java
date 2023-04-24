@@ -71,7 +71,8 @@ public class SignUpActivity extends AppCompatActivity {
                 String insertUserQuery = "INSERT INTO " + DbHelper.USERS_TABLE + " VALUES(NULL, '" +
                                           usernameToRegister + "', '" +
                                           passwordToRegister + "', '" +
-                                          emailToRegister + "')";
+                                          emailToRegister + "', " +
+                                          "NULL)";
                 dbHelper.execSQLAsync(insertUserQuery, this::OnUserCreated);
             }
             cursor.close();
