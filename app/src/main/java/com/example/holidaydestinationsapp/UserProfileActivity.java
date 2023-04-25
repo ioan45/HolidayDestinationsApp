@@ -94,6 +94,7 @@ public class UserProfileActivity extends AppCompatActivity {
     public void onSignOutButtonPress(View v) {
         if (!User.signedInUser.getUsername().equals(User.signedInUser.getDisplayName())) {
             // Signed in using google account.
+
             User.googleSignInClient.signOut()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                         @Override
@@ -104,8 +105,11 @@ public class UserProfileActivity extends AppCompatActivity {
                     });
         } else {
             // Signed in using app functionality.
+
             SharedPreferencesManager spManager = SharedPreferencesManager.getInstance(this);
             spManager.putStringAsync(SharedPreferencesManager.KEY_SESSION_TOKEN, null);
+            // Cancelling the scheduled session expired notification.
+            stopService(new Intent(this.getApplicationContext(), RaiseNotificationService.class));
             User.signedInUser = null;
             loadSignInActivity();
         }

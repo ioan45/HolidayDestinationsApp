@@ -1,23 +1,15 @@
 package com.example.holidaydestinationsapp;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
@@ -25,6 +17,7 @@ import com.google.android.gms.tasks.Task;
 import java.util.UUID;
 
 public class SignInActivity extends AppCompatActivity {
+    public static final int SESSION_VALID_DURATION = 20;  // in seconds
     private static final int RC_SIGN_IN = 100;
 
     private EditText usernameInput;
@@ -93,17 +86,6 @@ public class SignInActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            // User has signed in with google.
-            signInGoogleUser(account.getId(), account.getDisplayName(), account.getEmail());
-        } catch (ApiException e) {
-            finish();
-            startActivity(getIntent());
-        }
-    }
-
     public void onClickSignInButton(View v) {
         if (isSigningIn)
             return;
@@ -119,10 +101,21 @@ public class SignInActivity extends AppCompatActivity {
 
         // Trying to get the user from database.
         String selectQuery = "SELECT " + DbHelper.USERS_COL_ID +
-                             " FROM " + DbHelper.USERS_TABLE +
-                             " WHERE " + DbHelper.USERS_COL_USERNAME + "='" + usernameToCheck + "'" +
-                                " and " + DbHelper.USERS_COL_PASSWORD + "='" + passwordToCheck + "'";
+                " FROM " + DbHelper.USERS_TABLE +
+                " WHERE " + DbHelper.USERS_COL_USERNAME + "='" + usernameToCheck + "'" +
+                " and " + DbHelper.USERS_COL_PASSWORD + "='" + passwordToCheck + "'";
         dbHelper.rawQueryAsync(selectQuery, this::onGetUserComplete);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            // User has signed in with google.
+            signInGoogleUser(account.getId(), account.getDisplayName(), account.getEmail());
+        } catch (ApiException e) {
+            finish();
+            startActivity(getIntent());
+        }
     }
 
     private void onGetUserComplete(Cursor cursor) {
@@ -143,6 +136,7 @@ public class SignInActivity extends AppCompatActivity {
         } else {
             createUserSession(user.getId());
             signInUser(user);
+            scheduleSessionExpiredNotification();
         }
     }
 
@@ -190,6 +184,17 @@ public class SignInActivity extends AppCompatActivity {
         dbHelper.execSQLAsync(deleteQuery, () ->
             dbHelper.execSQLAsync(insertQuery, null)
         );
+    }
+
+    private void scheduleSessionExpiredNotification() {
+        // Start the service.
+        AsyncTask.execute(() -> {
+            Intent notifServiceIntent = new Intent(this.getApplicationContext(), RaiseNotificationService.class);
+            notifServiceIntent.putExtra(RaiseNotificationService.EXTRA_NOTIF_TYPE, RaiseNotificationService.NOTIF_TYPE_SESSION_EXPIRED);
+            notifServiceIntent.putExtra(RaiseNotificationService.EXTRA_NOTIF_DELAY, SESSION_VALID_DURATION);
+            notifServiceIntent.putExtra(RaiseNotificationService.EXTRA_USER_DISPLAY_NAME, User.signedInUser.getDisplayName());
+            startForegroundService(notifServiceIntent);
+        });
     }
 
     private String generateSessionToken() {

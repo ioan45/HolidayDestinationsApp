@@ -6,17 +6,28 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 
 public class SharedPreferencesManager {
+    public interface OnCompleteCallback {
+        void OnComplete();
+    }
+
     private static class PutStringTask extends AsyncTask<String, Void, Void> {
         private final SharedPreferences.Editor editor;
+        private OnCompleteCallback callback;
 
-        public PutStringTask(SharedPreferences.Editor editor) {
+        public PutStringTask(SharedPreferences.Editor editor, OnCompleteCallback callback) {
             this.editor = editor;
+            this.callback = callback;
         }
 
         protected Void doInBackground(String... pair) {
             editor.putString(pair[0], pair[1]);
             editor.commit();
             return null;
+        }
+
+        protected void onPostExecute(Void nothing) {
+            if (callback != null)
+                callback.OnComplete();
         }
     }
 
@@ -40,7 +51,11 @@ public class SharedPreferencesManager {
     }
 
     public void putStringAsync(String key, String value) {
-        (new PutStringTask(editor)).execute(key, value);
+        (new PutStringTask(editor, null)).execute(key, value);
+    }
+
+    public void putStringAsync(String key, String value, OnCompleteCallback callback) {
+        (new PutStringTask(editor, callback)).execute(key, value);
     }
 
     public String getString(String key) {

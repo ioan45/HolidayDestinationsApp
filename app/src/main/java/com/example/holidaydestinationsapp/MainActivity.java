@@ -39,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 int userId = cursor.getInt(idIndex);
                 String username = cursor.getString(usernameIndex);
                 long dateAsSecondsSinceEpoch = cursor.getLong(dateIndex);
-                if (System.currentTimeMillis() / 1000 - dateAsSecondsSinceEpoch < 86400) {
-                    // A session is valid for 1 day.
+                if (System.currentTimeMillis() / 1000 - dateAsSecondsSinceEpoch < SignInActivity.SESSION_VALID_DURATION) {
                     user = new User(userId, username, username);
                 }
             }
