@@ -1,7 +1,6 @@
 package com.example.holidaydestinationsapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,8 +10,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,36 +25,41 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.ByteArrayOutputStream;
+public class ProfileFragment extends Fragment {
 
-public class UserProfileActivity extends AppCompatActivity {
     private static final int SELECT_GALLERY_IMAGE = 200;
-
     private ImageView profileImage;
     private TextView greetingMsg;
     private Button signOutButton;
-
     private DbHelper dbHelper;
 
+    public ProfileFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_profile);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        profileImage = findViewById(R.id.profileImage);
-        greetingMsg = findViewById(R.id.greetingMessage);
-        signOutButton = findViewById(R.id.signOutButton);
+        profileImage = rootView.findViewById(R.id.profileImage);
+        greetingMsg = rootView.findViewById(R.id.greetingMessage);
+        signOutButton = rootView.findViewById(R.id.signOutButton);
 
-        dbHelper = DbHelper.getInstance(this);
+        dbHelper = DbHelper.getInstance(getContext());
 
         initProfileImage();
         greetingMsg.setText(getString(R.string.greetings, User.signedInUser.getDisplayName()));
         signOutButton.setOnClickListener(this::onSignOutButtonPress);
+
+        return rootView;
     }
 
     private void initProfileImage() {
         String selectQuery = "SELECT " + DbHelper.USERS_COL_PROFILE_IMG +
-                             " FROM " + DbHelper.USERS_TABLE +
-                             " WHERE " + DbHelper.USERS_COL_ID + "=" + User.signedInUser.getId();
+                " FROM " + DbHelper.USERS_TABLE +
+                " WHERE " + DbHelper.USERS_COL_ID + "=" + User.signedInUser.getId();
         dbHelper.rawQueryAsync(selectQuery, (Cursor cursor) -> {
             if (cursor.moveToFirst()) {
                 int blobIndex = cursor.getColumnIndex(DbHelper.USERS_COL_PROFILE_IMG);
@@ -96,7 +105,7 @@ public class UserProfileActivity extends AppCompatActivity {
             // Signed in using google account.
 
             User.googleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    .addOnCompleteListener(this.getActivity(), new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             User.signedInUser = null;
@@ -106,10 +115,10 @@ public class UserProfileActivity extends AppCompatActivity {
         } else {
             // Signed in using app functionality.
 
-            SharedPreferencesManager spManager = SharedPreferencesManager.getInstance(this);
+            SharedPreferencesManager spManager = SharedPreferencesManager.getInstance(this.getActivity());
             spManager.putStringAsync(SharedPreferencesManager.KEY_SESSION_TOKEN, null);
             // Cancelling the scheduled session expired notification.
-            stopService(new Intent(this.getApplicationContext(), RaiseNotificationService.class));
+            this.getActivity().stopService(new Intent(this.getActivity().getApplicationContext(), RaiseNotificationService.class));
             User.signedInUser = null;
             loadSignInActivity();
         }
@@ -118,13 +127,13 @@ public class UserProfileActivity extends AppCompatActivity {
     private void saveProfileImageToDb(Bitmap profileImg) {
         String blobImg = bitmapToBlobLiteral(profileImg);
         String updateQuery = "UPDATE " + DbHelper.USERS_TABLE +
-                             " SET " + DbHelper.USERS_COL_PROFILE_IMG + "=" + blobImg +
-                             " WHERE " + DbHelper.USERS_COL_ID + "=" + User.signedInUser.getId();
+                " SET " + DbHelper.USERS_COL_PROFILE_IMG + "=" + blobImg +
+                " WHERE " + DbHelper.USERS_COL_ID + "=" + User.signedInUser.getId();
         dbHelper.execSQLAsync(updateQuery, null);
     }
 
     private void loadSignInActivity() {
-        this.startActivity(new Intent(this, SignInActivity.class));
+        this.startActivity(new Intent(this.getActivity(), SignInActivity.class));
     }
 
     private String bitmapToBlobLiteral(Bitmap img) {

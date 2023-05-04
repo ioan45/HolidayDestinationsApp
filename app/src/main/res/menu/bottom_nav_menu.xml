@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Profile"
+        android:icon="@drawable/baseline_person_24"
+        android:id="@+id/toProfileButton"/>
+    <item
+        android:title="Destinations"
+        android:icon="@drawable/baseline_airplane_ticket_24"
+        android:id="@+id/toDestinationsButton"/>
+</menu>
