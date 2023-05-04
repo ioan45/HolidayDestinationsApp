@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
+        <item name="android:windowAnimationStyle">@style/CustomActivitiesAnimation</item>
+    </style>
+
+    <style name="CustomActivitiesAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_enter_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_exit_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_enter_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_exit_right</item>
+    </style>
+</resources>
