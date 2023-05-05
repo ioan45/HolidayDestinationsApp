@@ -30,7 +30,11 @@ public class DestinationsAdapter extends RecyclerView.Adapter<DestinationsViewHo
         holder.nameHotel.setText(itemDestinationList.get(position).getHotelName());
         holder.addressHotel.setText(itemDestinationList.get(position).getHotelAddress());
         holder.hotelImage.setImageResource(itemDestinationList.get(position).getImageHotel());
+
+        // Set lat and lgt values for the item
+        holder.setLatLgt(itemDestinationList.get(position).getLat(), itemDestinationList.get(position).getLgt());
     }
+
 
     @Override
     public int getItemCount() {

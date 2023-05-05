@@ -4,11 +4,14 @@ public class ItemDestination {
     String hotelName;
     String hotelAddress;
     int imageHotel;
+    double lat, lgt;
 
-    public ItemDestination(String hotelName, String hotelAddress, int imageHotel) {
+    public ItemDestination(String hotelName, String hotelAddress, int imageHotel, double lat, double lgt) {
         this.hotelName = hotelName;
         this.hotelAddress = hotelAddress;
         this.imageHotel = imageHotel;
+        this.lat = lat;
+        this.lgt = lgt;
     }
 
     public String getHotelName() {
@@ -23,8 +26,8 @@ public class ItemDestination {
         return hotelAddress;
     }
 
-    public void setHotelAddress(String hotelAdress) {
-        this.hotelAddress = hotelAdress;
+    public void setHotelAddress(String hotelAddress) {
+        this.hotelAddress = hotelAddress;
     }
 
     public int getImageHotel() {
@@ -33,5 +36,21 @@ public class ItemDestination {
 
     public void setImageHotel(int imageHotel) {
         this.imageHotel = imageHotel;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLgt() {
+        return lgt;
+    }
+
+    public void setLgt(double lgt) {
+        this.lgt = lgt;
     }
 }
