@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.MapFragment;
-
 public class DestinationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     ImageView hotelImage;
