@@ -38,15 +38,15 @@ public class DestinationsViewHolder extends RecyclerView.ViewHolder implements V
     @Override
     public void onClick(View view) {
         // Pass lat and lgt values to the mapFragment
-        Fragment mapFragment = new MapsFragment();
-        Bundle args = new Bundle();
-        args.putDouble("lat", lat);
-        args.putDouble("lgt", lgt);
-        mapFragment.setArguments(args);
-        ((AppCompatActivity) view.getContext()).getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.homeFrameLayout, mapFragment)
-                .commit();
+//        Fragment mapFragment = new MapsFragment();
+//        Bundle args = new Bundle();
+//        args.putDouble("lat", lat);
+//        args.putDouble("lgt", lgt);
+//        mapFragment.setArguments(args);
+//        ((AppCompatActivity) view.getContext()).getSupportFragmentManager()
+//                .beginTransaction()
+//                .replace(R.id.homeFrameLayout, mapFragment)
+//                .commit();
     }
 }
 

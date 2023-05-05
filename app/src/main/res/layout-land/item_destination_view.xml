@@ -16,7 +16,7 @@
         android:id="@+id/hotelName"
         android:layout_toEndOf="@id/hotelImageView"
         android:textColor="@color/black"
-        android:textSize="20dp"
+        android:textSize="15dp"
         android:text="Name"/>
     <TextView
         android:layout_width="match_parent"
